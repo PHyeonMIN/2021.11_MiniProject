@@ -1,6 +1,7 @@
 package Model;
 
 public class MemberDAO {
-		///??
-	// Â¯½½ ±êÇãºê ¿¬°á ¿Ï·á
+		public void connect() {
+			
+		}
 }
