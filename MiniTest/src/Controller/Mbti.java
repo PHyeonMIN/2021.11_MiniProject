@@ -4,122 +4,221 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Mbti {
+import Model.SurveyDAO;
+import Model.SurveyDTO;
 
+public class Mbti {
+	SurveyDAO sdao = new SurveyDAO();
+	SurveyDTO sdto;
 	Random rd = new Random();
 	Scanner sc = new Scanner(System.in);
-	private int cnt = 0;
-	ArrayList<String> MbtiQuery_EI = new ArrayList<String>();
-	ArrayList<String> MbtiQuery_NS = new ArrayList<String>();
-	ArrayList<String> MbtiQuery_FT = new ArrayList<String>();
-	ArrayList<String> MbtiQuery_PJ = new ArrayList<String>();
+
 	String[] Mbti = new String[4];
-	
-	
 
-	private void RandomQuery(String Query) {
-		int random = 0;
-		switch (Query) {
-		case "EI":
-			for (int i = 0; i < 5; i++) {
-				random = rd.nextInt(MbtiQuery_EI.size()); 
-				System.out.println(MbtiQuery_EI.get(random));
-				int select = sc.nextInt();
-				MbtiQuery_EI.remove(random);
-				
-		
+	public void PlayQuery(String id) {
+		int G_life = sdao.Bring_G_life(id);
+		int cnt = sdao.BringCnt(id);
+		int EI = sdao.Bring_EI(id);
+		int SN = sdao.Bring_SN(id);
+		int TF = sdao.Bring_TF(id);
+		int JP = sdao.Bring_JP(id);
+		int select = 0;
+		if (G_life > 0 && cnt <= 20) {
+
+			sdao.BringQuery(id);
+			select = sc.nextInt();
+			G_life--;
+			sdao.Update_G_life(id, G_life);
+			if (select == 1) {
+				switch (cnt) {
+				case 1:
+				case 5:
+				case 9:
+				case 13:
+				case 17:
+					EI++;
+					break;
+				case 2:
+				case 6:
+				case 10:
+				case 14:
+				case 18:
+					SN++;
+					break;
+				case 3:
+				case 7:
+				case 11:
+				case 15:
+				case 19:
+					TF++;
+					break;
+				case 4:
+				case 8:
+				case 12:
+				case 16:
+				case 20:
+					JP++;
+					break;
+
+				}
+			} else if (select == 2) {
+				switch (cnt) {
+				case 1:
+				case 5:
+				case 9:
+				case 13:
+				case 17:
+					EI--;
+					break;
+				case 2:
+				case 6:
+				case 10:
+				case 14:
+				case 18:
+					SN--;
+					break;
+				case 3:
+				case 7:
+				case 11:
+				case 15:
+				case 19:
+					TF--;
+					break;
+				case 4:
+				case 8:
+				case 12:
+				case 16:
+				case 20:
+					JP--;
+					break;
+				}
 			}
-			break;
-		case "NS":
-			for (int i = 0; i < 5; i++) {
-				random = rd.nextInt(MbtiQuery_NS.size());
-			
-				System.out.println(MbtiQuery_NS.get(random));
-				int select = sc.nextInt();
-				MbtiQuery_NS.remove(random);
+
+			sdao.Update_EI(id, EI);
+			sdao.Update_SN(id, SN);
+			sdao.Update_TF(id, TF);
+			sdao.Update_JP(id, JP);
+
+			cnt++;
+			sdao.UpdateCnt(cnt, id);
+			if (cnt == 21) {
+				String EI1;
+				String SN1;
+				String TF1;
+				String JP1;
+				int a = sdao.Bring_EI(id);
+				int b = sdao.Bring_SN(id);
+				int c = sdao.Bring_TF(id);
+				int d = sdao.Bring_JP(id);
+				if (a > 0) {
+					EI1 = "E";
+				} else {
+					EI1 = "I";
+				}
+				if (b > 0) {
+					SN1 = "S";
+				} else {
+					SN1 = "N";
+				}
+				if (c > 0) {
+					TF1 = "T";
+				} else {
+					TF1 = "F";
+				}
+				if (d > 0) {
+					JP1 = "J";
+				} else {
+					JP1 = "P";
+				}
+
+				String last = EI1 + SN1 + TF1 + JP1;
+				sdao.Update_mbti(id, last);
+				String inf = "";
+				if(last.equals("ISTJ")) {
+					inf="ì±…ì„ê°ì´ ê°•í•˜ë©°, í˜„ì‹¤ì ì´ë‹¤. ë§¤ì‚¬ì— ì² ì €í•˜ê³  ë³´ìˆ˜ì ì´ë‹¤.";
+				}
+				else if(last.equals("ISFJ")) {
+					inf="ì°¨ë¶„í•˜ê³  í—Œì‹ ì ì´ë©°, ì¸ë‚´ì‹¬ì´ ê°•í•˜ë‹¤. íƒ€ì¸ì˜ ê°ì •ë³€í™”ì— ì£¼ì˜ë¥¼ ê¸°ìš¸ì¸ë‹¤";
+				}
+				else if(last.equals("INFJ")) {
+					inf="ë†’ì€ í†µì°°ë ¥ìœ¼ë¡œ ì‚¬ëŒë“¤ì—ê²Œ ì˜ê°ì„ ì¤€ë‹¤. ê³µë™ì²´ì˜ ì´ìµì„ ì¤‘ìš”ì‹œí•œë‹¤.";
+				}
+				else if(last.equals("INTJ")) {
+					inf="ì˜ì§€ê°€ ê°•í•˜ê³ , ë…ë¦½ì ì´ë‹¤. ë¶„ì„ë ¥ì´ ë›°ì–´ë‚˜ë‹¤.";
+				}
+				else if(last.equals("ISTP")) {
+					inf="ê³¼ë¬µí•˜ê³  ë¶„ì„ì ì´ë©°, ì ì‘ë ¥ì´ ê°•í•˜ë‹¤.";
+				}
+				else if(last.equals("ISFP")) {
+					inf="ì˜¨í™”í•˜ê³  ê²¸ì†í•˜ë‹¤. ì‚¶ì˜ ì—¬ìœ ë¥¼ ë§Œë½í•œë‹¤.";
+				}
+				else if(last.equals("INFP")) {
+					inf="ì„±ì‹¤í•˜ê³  ì´í•´ì‹¬ ë§ìœ¼ë©°, ê°œë°©ì ì´ë‹¤. ì˜ í‘œí˜„í•˜ì§€ ì•Šìœ¼ë‚˜, ë‚´ì  ì‹ ë…ì´ ê°•í•˜ë‹¤.";
+				}
+				else if(last.equals("INTP")) {
+					inf="ì§€ì  í˜¸ê¸°ì‹¬ì´ ë†’ìœ¼ë©°, ì ì¬ë ¥ê³¼ ê°€ëŠ¥ì„±ì„ ì¤‘ìš”ì‹œí•œë‹¤.";
+				}
+				else if(last.equals("ESTP")) {
+					inf="ëŠê¸‹í•˜ê³ , ê´€ìš©ì ì´ë©°, íƒ€í˜‘ì„ ì˜í•œë‹¤. í˜„ì‹¤ì  ë¬¸ì œ í•´ê²°ì— ëŠ¥ìˆ™í•˜ë‹¤.";
+				}
+				else if(last.equals("ESFP")) {
+					inf="í˜¸ê¸°ì‹¬ì´ ë§ìœ¼ë©°, ê°œë°©ì ì´ë‹¤. êµ¬ì²´ì ì¸ ì‚¬ì‹¤ì„ ì¤‘ì‹œí•œë‹¤.";
+				}
+				else if(last.equals("ENFP")) {
+					inf="ìƒìƒë ¥ì´ í’ë¶€í•˜ê³ , ìˆœë°œë ¥ì´ ë›°ì–´ë‚˜ë‹¤. ì¼ìƒì ì¸ í™œë™ì— ì§€ë£¨í•¨ì„ ëŠë‚€ë‹¤.";
+				}
+				else if(last.equals("ENTP")) {
+					inf="ë°•í•™ë‹¤ì‹í•˜ê³ , ë…ì°½ì ì´ë‹¤. ëŠì„ì—†ì´ ìƒˆë¡œìš´ ì‹œë„ë¥¼ í•œë‹¤";
+				}
+				else if(last.equals("ESTJ")) {
+					inf="ì²´ê³„ì ìœ¼ë¡œ ì¼í•˜ê³ , ê·œì¹™ì„ ì¤€ìˆ˜í•œë‹¤. ì‚¬ì‹¤ì  ëª©í‘œ ì„¤ì •ì— ëŠ¥í•˜ë‹¤.";
+				}
+				else if(last.equals("ESFJ")) {
+					inf="ì‚¬ëŒì— ëŒ€í•œ ê´€ì‹¬ì´ ë§ìœ¼ë©°, ì¹œì ˆí•˜ë‹¤. ë™ì •ì‹¬ì´ ë§ë‹¤.";
+				}
+				else if(last.equals("ENFJ")) {
+					inf="ì‚¬êµì ì´ê³ , íƒ€ì¸ì˜ ì˜ê²¬ì„ ì¡´ì¤‘í•œë‹¤. ë¹„íŒì„ ë°›ìœ¼ë©´ ì˜ˆë¯¼í•˜ê²Œ ë°˜ì‘í•œë‹¤.";
+				}
+				else if(last.equals("ENTJ")) {
+					inf="ì² ì €í•œ ì¤€ë¹„ë¥¼ í•˜ë©°, í™œë™ì ì´ë‹¤. í†µì†”ë ¥ì´ ìˆìœ¼ë©°, ë‹¨í˜¸í•˜ë‹¤.";
+				}
+				sdao.Update_mbtiInfor(inf, id);
+//				System.out.println("graduate");
+				System.out.println();
+				System.out.println(" â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ    â–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ");
+				System.out.println("â–ˆâ–ˆ       â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ  â–ˆâ–ˆ");
+				System.out.println("â–ˆâ–ˆ   â–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ   â–ˆâ–ˆ  â–ˆâ–ˆ");
+				System.out.println("â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ ");
+				System.out.println(" â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ");
+				System.out.println();
+				System.out.println("              â”€â”€â”€â”€â”€â”€ ì´ì œ 'ë‚˜ì˜ ìƒíƒœì°½'ì—ì„œ ìì‹ ì˜ MBTIë¥¼ í™•ì¸í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤. â”€â”€â”€â”€â”€â”€");
+
 			}
-			break;
-		case "FT":
-			for (int i = 0; i < 5; i++) {
-				random = rd.nextInt(MbtiQuery_FT.size());
-				System.out.println(MbtiQuery_FT.get(random));
-				int select = sc.nextInt();
-				MbtiQuery_FT.remove(random);
-			}
-			break;
-		case "PJ":
-			for (int i = 0; i < 5; i++) {
-				random = rd.nextInt(MbtiQuery_PJ.size());
-				System.out.println(MbtiQuery_PJ.get(random));
-				int select = sc.nextInt();
-				MbtiQuery_PJ.remove(random);
-			}
-			break;
 		}
-	}
+		else if(cnt==21) {
+//			System.out.println("already graduate");
+			
+			System.out.println();
+			System.out.println(" â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ    â–ˆâ–ˆ");
+			System.out.println("â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ  â–ˆâ–ˆ  â–ˆâ–ˆ  ");
+			System.out.println("â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆ   ");
+			System.out.println("â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    ");
+			System.out.println("â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ     â–ˆâ–ˆ    ");
+			System.out.println();
+			System.out.println();
+			System.out.println(" â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ    â–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ");
+			System.out.println("â–ˆâ–ˆ       â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ  â–ˆâ–ˆ");
+			System.out.println("â–ˆâ–ˆ   â–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ   â–ˆâ–ˆ  â–ˆâ–ˆ");
+			System.out.println("â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ    â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆ      â–ˆâ–ˆ   â–ˆâ–ˆ ");
+			System.out.println(" â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆ   â–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ  â–ˆâ–ˆ   â–ˆâ–ˆ    â–ˆâ–ˆ    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ   â–ˆâ–ˆ");
+			System.out.println();
+			
+		}
+		else {
+			System.out.println("ì„±ì¥ í•  ê¸°íšŒë¥¼ ë‹¤ ì‚¬ìš©í•˜ì˜€ìŠµë‹ˆë‹¤. 'í‚¤ìš°ê¸°'ë¥¼ í†µí•´ ì„±ì¥ê¸°íšŒë¥¼ íšë“í•˜ì„¸ìš”.");
 
-	public Mbti(int num) {
-		this.cnt = num;
+		}
 
-	}
-
-	public Mbti(String Query) {
-		if (Query.equals("EI"))
-			Mbti_EI(Query);
-		else if (Query.equals("NS"))
-			Mbti_NS(Query);
-		else if (Query.equals("FT"))
-			Mbti_FT(Query);
-		else if (Query.equals("PJ"))
-			Mbti_PJ(Query);
-	}
-
-	public void Mbti_EI(String Query) {
-		MbtiQuery_EI.add("¹İ·Áµ¿¹°°ú ³î°í ½ÍÀ»¶§ ¹«¾ùÀ» ÇÏ°í½ÍÀº°¡¿ä?\r\n" + "1. »êÃ¥ÇÏ±â    2. Áı¿¡¼­ °°ÀÌ Àå³­Ä¡±â");
-		MbtiQuery_EI.add("´ç½ÅÀº ¾î¶°ÇÑ Áú¹®À» ¹Ş¾Ò½À´Ï´Ù. Áú¹®ÀÌ ¹Ù·Î ¶°¿À¸£Áö ¾ÊÀ» ¶§ ¾î¶»°Ô ÇÏ½Ã³ª¿ä?\r\n" + "1. ÀÏ´Ü ¶°¿À¸£´Â ºÎºĞÀ» ¸»ÇÏ°í ´ÙÀ½ ºÎºĞÀ» »ı°¢ÇÑ´Ù\r\n"
-				+ "2. °õ°õÈ÷ »ı°¢ÇÏ°í Á¤¸®ÇØ¼­ ÇÑ¹ø¿¡ ¸»ÇÑ´Ù.");
-		MbtiQuery_EI.add("¾î¶² ¿µÈ­¸¦ º¸°í ÇÑ Àå¸é¿¡¼­ °¨µ¿À» ¹Ş¾Ò½À´Ï´Ù. ´ç½ÅÀº ¾î¶»°Ô ÇÏ³ª¿ä?\r\n" + "1. ¿Ö °¨µ¿ÀûÀÎÁö È¥ÀÚ »ı°¢ÇØº»´Ù.\r\n"
-				+ "2. Ä£±¸µéÇÑÅ× °¨µ¿ÀûÀÎ ºÎºĞÀ» ¼³¸íÇÑ´Ù.");
-		MbtiQuery_EI.add("Áú¹®Ãß°¡1");
-		MbtiQuery_EI.add("Áú¹®Ãß°¡2");
-		
-		RandomQuery(Query);
-		
-	}
-
-	public void Mbti_NS(String Query) {
-		MbtiQuery_NS.add("¾î¶°ÇÑ ¹®Á¦¸¦ ÇØ°áÇÏ±â À§ÇÑ ÇØ°á Ã¥À» °í¸¥´Ù¸é?\r\n" + "1. °ú°Å¿¡¼­ °ËÁõµÈ ÇØ°á Ã¥\r\n" + "2. ÀÌ ¼¼»ó¿¡ ¾ø´ø ÇØ°áÃ¥ ");
-		MbtiQuery_NS.add("´©±º°¡ ÀÚ½Å¿¡°Ô ¾Æ¹« »ı°¢ÇÏÁö ¸»¶ó°í ¸»ÇÑ´Ù¸é? \r\n" + "1. ¿õ ¾Æ¹« »ı°¢µµ ¾ÈÇÒ°Û ¤¾¤¾\r\n" + "2. ¾Æ¹« »ı°¢ÇÏÁö ¸»¶ó°í? ÀÏ´Ü ¹éÁöºÎÅÍ ±×·Áº¸ÀÚ ");
-		MbtiQuery_NS.add("°øºÎÇÏ±â ½ÈÀ» ¶§ ¹«½¼ »ı°¢ÀÌ µå´Â°¡?\r\n" + "1. ÀÌ¹ø¿¡ Á¡¼ö Àß ¹Ş¾Æ¾ßÇÏ´Âµ¥ ¹üÀ§°¡ ÁÙ¾úÀ¸¸é ÁÁ°Ú´Ù \r\n"
-				+ "2. ½ÃÇèÀ» µµ´ëÃ¼ ¿Ö º¸´Â°ÅÁö? ¾ğÁ¨°£ ½ÃÇèÀÌ »ç¶óÁö°ÚÁö? ");
-		MbtiQuery_NS.add("´ç½ÅÀÌ ½ÅÀÔ»ç¿øÀÌ¶ó¸é ¾î¶² ÆÀÀåÀ» ¼±È£ÇÏ´Â°¡?\r\n" + "1. ÇÒ ÀÏÀ» ±¸Ã¼ÀûÀ¸·Î ¸í½ÃÇØÁà¾ßÇÑ´Ù \r\n" + "2. ¹æÇâ¸¸ Á¦½ÃÇØÁÖ°í ³» ÀÚ½Å¿¡°Ô ¸Ã°ÜÁà¾ßÇÑ´Ù ");
-		MbtiQuery_NS.add(
-				"¼Ò¼³ÀÌ³ª ³İÇÃ¸¯½º¸¦ º¼ ¶§,\r\n" + "1. ¹è¿ì, ÀÎ¹°, ½ºÅä¸®¿¡ ¸ğµÎ ÁıÁß! ³¡±îÁö ÇÑ¹ø¿¡ º»´Ù \r\n" + "2. °¨µ¿ÀûÀÌ°Å³ª ÀÚ±ØÀûÀÎ Àå¸éÀÎ °æ¿ì µÇµ¹·Á¼­ ´Ù½Ã º»´Ù");
-		RandomQuery(Query);
-	}
-
-	public void Mbti_FT(String Query) {
-		MbtiQuery_FT.add("³ª ¸Ó¸®Àß¶ú¾î\r\n" + "1. ¾ó¸¶³ª? º¸¿©Áà	 2. ¹«½¼ÀÏ ÀÖ¾ú¾î?");
-		MbtiQuery_FT.add("µ·À» ¿­½ÉÈ÷ ¸ğ¾Æ¼­ ³ëÆ®ºÏÀ» »ò´Ù.\r\n" + "1. ¾Æ ÁøÂ¥? ¾îµğ²¨?  2. ¿ì¿Í µ· ¸ğÀ¸´À¶ó °í»ıÇß°Ú³×¤Ğ");
-		MbtiQuery_FT.add("ÀÌ·¯¸é ¾Æ¹«µµ ³Ê ¾ÈÁÁ¾ÆÇØ\r\n" + "1. ÁöxÇÏÁö¸¶    2. (¸¶»ó, Ãæ°İ, °øÆ÷)");
-		MbtiQuery_FT.add("Â÷ »ç°í°¡ ³²\r\n" + "1. º¸Çè µé¾ú¾î?  2. ±¦Âú¾Æ? ´ÙÄ£µ¥´Â ¾ø¾î?");
-		MbtiQuery_FT.add("³Ê Èûµé¾îº¸¿©¼­ °£½Ä Á» »ç¿Ô¾î\r\n" + "1. °í¸¶¿ö(³»°¡ Èûµé¾î º¸¿´³ª?)  2. °í¸¶¿ö °¨µ¿ÀÌ¾ß¤Ğ¤Ğ¤Ğ");
-		RandomQuery(Query);
-	}
-
-	public void Mbti_PJ(String Query) {
-		MbtiQuery_PJ.add("¾î¶°ÇÑ ÀÏÀÇ ¸¶¹«¸® ´Ü°è / Ã¥»óÁ¤¸®Çß´Ï?\r\n" + "1. Ã¥»óÀ» ÀüÇüÀûÀ¸·Î ¾ÆÁÖ ±ò²ûÇÏ°Ô Á¤µ·\r\n"
-				+ "		ÀÚÁÖ¾²´Â ¹°°ÇÀ» Ã£±â ½¬¿î°÷¿¡ µÎ°í, ¾÷¹«µé¿¡ ´ëÇÑ Á¤¸®Á¤µ·°ú ¼­¶øÁ¤¸®°¡ ÀßµÇ¾î ÀÖ´Ù\r\n" + "2. Ã¥»óÁ¤¸® x / ´Ù¾çÇÑ Á¾·ùÀÇ ÀÏµéÀ» ÀÚ½ÅÀÇ »î¼Ó¿¡ ±×³É µĞ´Ù");
-		MbtiQuery_PJ.add("¾à¼ÓÀ» Àâ¾Ò´Ù. ÇÏÁö¸¸ º¯°æ»çÇ×ÀÌ »ı°å´Ù\r\n" + "1. Á¤ÇÑ´ë·Î ÇÏÀÚ / ¾ğÁ¦¸¸³¯·¡ ¾îµğ¼­ ¸¸³¯·¡\r\n" + "2. ÁøÇàµÇ´Â °Å ºÁ °¡¸é¼­ÇÏÀÚ / ÇÔ ¸¸³ªÀÚ");
-		MbtiQuery_PJ.add("½ÃÇèÀÌ ¾ó¸¶ ¾È³²¾Ò´Ù. ÇÏÁö¸¸ ³»°¡ ÁÁ¾ÆÇÏ´Â ¾ÆÀÌµ¹ °ø¿¬ÀÌ Áı¾Õ¿¡¼­ ÇÑ´Ù. ³ªÀÇ ¼±ÅÃÀº?\r\n" + "1. ¸ÕÀú ÀÏÇÏ°í ³ªÁß¿¡ ½Ã°£¿¡ ³²À¸¸é ³í´Ù\r\n"
-				+ "2. ÇöÀç¸¦ Áñ±â°í ÀÏÀº ³ªÁß¿¡ ¸¶¹«¸®ÇÑ´Ù.");
-		MbtiQuery_PJ.add("PJ1");
-		MbtiQuery_PJ.add("PJ2");
-		RandomQuery(Query);
-	}
-
-	public int getCnt() {
-		return cnt;
 	}
 
 }
